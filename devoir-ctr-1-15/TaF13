@@ -1,0 +1,142 @@
+1
+
+
+  Le sous-repertoire 'bin/' de votre repertoire de travail
+  contient un executable 'segrpro'. Etant lance il engendre
+  certain nombre de processus qui sont organises en sessions,
+  qui contienent des groupes qui, a leurs tour, se composent 
+  de processus "individuels".
+
+  Lancez 'segrpro'. Combien de sessions voiez vous? Combien
+  de groupes contient chaque session? Combien de processus 
+  contient chaque groupe? Quels sont les ID correspondants?
+
+  Enregistrez dans le fichier "reponses.txt" votre reponse 
+  ainsi que toutes les operations que vous avez effectue pour
+  la retrouver.
+
+  N'OUBLIEZ PAS DE TUER TOUS LES PROCESSUS ENGENDRE!!!!!
+
+2
+
+   L'executable 'bsign' qui se trouve dans le sous-repertoire 'bin'
+   lance un processus qui bloque certains signaux parmi
+ 
+     SIGTSTP, SIGHUP, SIGPIPE, SIGCONT, SIGTERM, SIGTTIN, SIGQUIT, SIGINT
+
+   Trouvez experimentalement quels signaux ci-dessus sont bloques? 
+
+   Mettez vos explications ainsi que le resultat dans 'reponses.txt'
+
+
+3
+
+  Dans le repertoire 'Src/' vous trouvez un programme
+  qui s'appele 'blabla.c' Compilez et lancez le pour 
+  voir son comportement.
+
+  Modifiez ce programme de telle facon qu'il 
+  imprime "Not ready!"  apres le premier signal SIGALRM
+  mais qu'il reagisse par defaut sur le deuxieme signal SIGALRM
+
+  Appelez le nouveau programme 'newblabla.c'. 
+  Mettez son source egalement dans le repertoire
+  'Src/'
+
+
+4
+
+   Voici les prototypes des 3 fonctions:
+          int f(int x,int y);
+          int g(int x,int y);
+          int h(int x,int,y int z);
+
+   Les definitions des ces fonctionnes se trouvent dans le fichier
+   defsXX.txt. Comme vous le voyez le calcul de chaque fonction prend
+   un certain temps. 
+
+   Le fichier 'int3x5-XX.dat' contient 5 triplets des valeurs du type
+   'int'. Soit un triplet a,b,c. Votre objectif consiste a calculer 
+   la valeur z de l'expression
+  
+          h(c,f(a,b),g(b,c))
+
+   pour tous les 5 triplets. 
+
+   Il vous faut organiser ce calcul en mode concurrentiel. Pour le faire  
+   vous devez creer les processus/threads Calcf,Calcg,Calch qui
+   calculent f,g,h conformement et le processus/thread Master qui
+   fournit les valeurs a,b, et c depuis le fichier 'int3x5-XX.dat',
+   attend que le resultat soit obtenu et l'affiche.
+
+   Plus precisement le systeme des processus/threads doit fonctionner
+   comme suit.
+
+   - 'Master' lit 3 entier depuis 'int3x5-XX.dat', informe les threads
+     correspondants que leurs arguments sont disponible, attend que le
+     resultat de calcul soit pret, l'affiche, lit 3 entiers suivants,
+     e.t.c. 5 fois.
+
+   - Chaque processus/thread 'Calcf','Calcg','Calch' attend que ses
+     arguments soient pret, calcule sa fonction (f,g ou h), informe les
+     processus/threads, qui dependent du resultat de ce calcul, que le
+     resultat est disponible (e.g. 'Calch' informe 'Master') et attend 
+     le tour suivant. 
+
+     Travail a faire.
+
+   (1) Indiquez explicitement quelle approche (processus ou threads)
+   utilisez vous.
+
+   (2.1) Si vous utlisez les processus alors ecrivez les programmes
+         expr-calc-sem-ini.c  -- mise en place des semaphores
+         expr-calc-sem-rm.c  -- suppression des semaphores
+         expr-calc-f-sem.c
+         expr-calc-g-sem.c
+         expr-calc-h-sem.c
+         expr-calc-m-sem.c  -- processus 'Master'
+         - vous chargez le programme 'expr-calc-m-sem.c' de l'ouverture
+         et de la fermeture du fichier qui contient les arguments (le
+         nom du fichier doit etre donne sur la ligne de commande)
+	 - vous definissez soigneusement tous les segments de la
+         memoire partagee et vous chargez le programme 'expr-calc-sem-ini.c'
+         de l'activation de ces segments
+	 - vous indiquez explicitement dans quel ordre et avec quels
+         arguments (si jamais) faut-il lancer vos programmes
+
+   (2.2) Si vous utilisez les threads alors ecrivez le programme 
+         'expr-calc-with-threads.c' ou vous mettez:
+         - definitions des fonctions f,g,h
+         - definitions des routines 'Calcf','Calcg','Calch','Master'
+	 - fonction 'main' qui recupere le nom du fichier avec les
+           arguments de la ligne de commande, ouvre ce fichier, cree
+           les threads necessaires (on passe au Master comme
+           l'argument le descripteur du fichier qui contient les
+           arguments) et attend que tout soit termine.
+         ATTENTION: c'est la routine 'Master' qui connait le nombre
+         des iterations (5 dans votre cas), les autres ne le
+         connaissent pas. 
+
+   (3) Vous enregistrez le resultat du fonctionnement de votre
+       programme/systeme des programmes dans le fichier 'reponses.txt'  
+       sous la forme suivante:
+
+          a1,b1,c1 -->  z1
+          a2,b2,c2 -->  z2
+          a3,b3,c3 -->  z3
+          a4,b4,c4 -->  z4
+          a5,b5,c5 -->  z5
+
+       Voici un exemple: 
+
+          verko@guenievre:~/$ ./a.out int3x5.dat
+
+              26,2,7 --> 19
+	      6,9,30 --> -24
+	      29,25,3 --> 26
+	      22,24,17 --> 5
+	      29,5,5 --> 24
+ 
+       Mettez les sources des vos programmes dans le sous-repertoire 'Src'
+
+

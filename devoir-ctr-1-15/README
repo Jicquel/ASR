@@ -1,0 +1,27 @@
+
+ Bonjour!
+
+ Avant de commencer votre travail lisez ce texte JUSQU'A LA FIN.
+
+ Le repertoire ou vous etes actuellement contient:
+        - sous-repertoire 'Src/', qui contient les sources des programmes 
+          a etudier/modifier, et ou vous alles mettre les sources des programmes 
+          que vous ferez;
+        - sous-repertoire 'bin/', qui contient certains executables
+        - le fichier 'README' que vous etes en train de lire;
+        - le fichier 'Travail-a-Faire' qui contient les textes des
+          exersices;
+
+ Maintenant creez le fichier 'reponses.txt' ou vous mettrez vos reponses 
+ "ecrites". N'y mettez pas s.v.p. les sources des programmes. Ecrivez 
+ tout au debut de ce fichier l'adresse IP de la machine sur laquelle vous 
+ travaillez.
+
+ Apres avoir termine votre travail OU BIEN 5 MIN AVANT LA FIN des heures
+ reglementaires archivez et compressez le repertoire de travail avec
+ son contenu, applez l'archive compresse "votrenomlogin-cntr-os-net-1-15.tar.gz".
+ Si tout va bien cet archive compresse doit se trouver directement dans
+ votre repertoire DOMICILE d'ou il sera recupere automatiquement.
+
+ Bon courage!
+

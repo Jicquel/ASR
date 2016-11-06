@@ -1,0 +1,23 @@
+
+int f(int x,int y) {
+  fdelta.tv_sec=1;
+  fdelta.tv_nsec=1000;
+  nanosleep(&fdelta,NULL);
+  return x-2*y;
+}
+
+int g(int x,int y) {
+  gdelta.tv_sec=0;
+  gdelta.tv_nsec=90000000;
+  nanosleep(&gdelta,NULL);
+  return 2*x+y;
+}
+
+int h(int x,int y,int z) {
+  hdelta.tv_sec=0;
+  hdelta.tv_nsec=900000;
+  nanosleep(&gdelta,NULL);
+  return 2*x+y-z;
+}
+
+
