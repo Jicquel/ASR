@@ -36,16 +36,17 @@ int main(void){
     exit(0);
   }
 
+
   while(1){
-    sleep(1);
     semop(semid0,&block,1);
     semop(semid1,&in,1);
     (*shval)+=2;
 
-    printf("  writer   %d: shval=%d",getpid(),*shval);
+    printf("  writer   %d: shval=%d\n",getpid(),*shval);
 
     semop(semid1,&out,1);
     semop(semid0,&unblock,1);
+  sleep(1);
   }
 
   return EXIT_SUCCESS;

@@ -40,9 +40,10 @@ int main(void){
     semop(semid0,&checkForWriter,1);
     semop(semid1,&in,1);
 
-    printf("      reader %d: shval=%d",getpid(),*shval);
+    printf("      reader %d: shval=%d\n",getpid(),*shval);
 
     semop(semid1,&out,1);
+    sleep(rand()%3);
   }
 
   return EXIT_SUCCESS;
