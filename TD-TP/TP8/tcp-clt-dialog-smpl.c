@@ -10,6 +10,13 @@ int main(int argc, char** argv){
   int x,nbBytes;
   int yes=1;
   char c[100];
+
+  if(argc != 2)
+  {
+    perror("./a.out <coordonnées serveur>");
+    exit(1);
+  }
+
   if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
     perror("setsockopt");
     exit(1);
@@ -25,13 +32,22 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-    send(idS,"salut\0",6,0);
+  printf("QUIT pour quitter\n");
+  printf("Entrer votre choix : ");
+  scanf("%s",c);
+  while( strcmp(c,"QUIT") != 0)
+  {
+    send(idS,c,strlen(c),0);
     printf("envoi\n");
     memset(&c,0,MAXBUF);
     nbBytes=recv(idS,c,MAXBUF,0);
-    printf("reçu %s",c);
+    printf("reçu %s\n",c);
+    memset(c,0,MAXBUF);
+    printf("QUIT pour quitter\n");
+    printf("Entrer votre choix : ");
+    scanf("%s",c);
+    printf("\n");
 
-    close(idS);
-
+  }
   return EXIT_SUCCESS;
 }

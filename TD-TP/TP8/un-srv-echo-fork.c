@@ -8,6 +8,8 @@
 #define MAXBUF 100
 
 int main(int argc, char** argv){
+
+
   int idS=socket(AF_UNIX,SOCK_STREAM,0);
   int nIdS,x,nbBytes;
   socklen_t toto = sizeof(struct sockaddr_un);;
@@ -23,6 +25,8 @@ int main(int argc, char** argv){
   local.sun_family=AF_UNIX;
   strncpy(local.sun_path,argv[1],sizeof(struct sockaddr_un)-2);
   unlink(local.sun_path);
+
+
   if(bind(idS,(struct sockaddr*)&local,sizeof(local))==-1){
     perror("bind");
     exit(1);
