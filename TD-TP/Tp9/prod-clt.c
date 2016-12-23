@@ -9,10 +9,9 @@
 
 int main(void){
   int idS=socket(AF_UNIX,SOCK_STREAM,0);
-  socklen_t toto = sizeof(struct sockaddr_un);;
   int yes=1;
   int reply=0;
-  int valeurEnvoye=2;
+  int valeurEnvoyee=0;
   if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
     perror("setsockopt");
     exit(1);
@@ -28,13 +27,21 @@ int main(void){
     exit(1);
   }
 
-  while(1){
-    send(idS,(void*)&valeurEnvoye,4,0);
+  printf("0 pour quitter\n");
+  printf("Combien de produits souhaitez-vous ajouter? : ");
+  scanf("%d",&valeurEnvoyee);
+  while( valeurEnvoyee != 0)
+  {
+    send(idS,(void*) &valeurEnvoyee,4,0);
     printf("envoi\n");
-    recv(idS,(void*)&reply,4,0);
-    printf("envoi bien effectué");
-    sleep(2);
-    }
+    valeurEnvoyee=0;
+    recv(idS,(void*) &reply,4,0);
+    printf("nombre total de produits : %d\n",reply);
+    reply=0;
+    printf("Combien de produits souhaitez-vous ajouter? : ");
+    scanf("%d",&valeurEnvoyee);
+    printf("\n");
+  }
   return EXIT_SUCCESS;
 }
 

@@ -15,19 +15,19 @@ pthread_cond_t noProduit = PTHREAD_COND_INITIALIZER, fullProduit = PTHREAD_COND_
 
 void* c_fonction(void* arg){
   int nIdS = *(int*)arg;
-  int nbBytes;
-
   int nbProduitEnleve;
+
+
   while(1){
-    nbBytes=recv(nIdS,(void*)&nbProduitEnleve,4,0);
+    recv(nIdS,(void*)&nbProduitEnleve,4,0);
     pthread_mutex_lock(&vitrine);
     while(nbProduit<nbProduitEnleve)
       pthread_cond_wait(&noProduit,&vitrine);
 
-        nbProduit-=nbProduitEnleve;
+    nbProduit-=nbProduitEnleve;
     pthread_mutex_unlock(&vitrine);
     pthread_cond_signal(&fullProduit);
-    //send(nIdS,c,nbBytes,0);
+    send(nIdS,(void*) &nbProduit,4,0);
   }
 }
 
@@ -37,11 +37,12 @@ void* consommateur(void* arg){
 
   int idS=socket(AF_UNIX,SOCK_STREAM,0);
   int nIdS,x,nbBytes;
-  socklen_t toto = sizeof(struct sockaddr_un);;
+  socklen_t lenghtSockaddr = sizeof(struct sockaddr_un);;
 
   int yes=1;
 
-  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
+  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1)
+  {
     perror("setsockopt");
     exit(1);
   }
@@ -52,18 +53,23 @@ void* consommateur(void* arg){
   strncpy(socket_Cons.sun_path,"/tmp/servCons",sizeof(struct sockaddr_un)-2);
   unlink(socket_Cons.sun_path);
 
-  if(bind(idS,(struct sockaddr*)&socket_Cons,sizeof(socket_Cons))==-1){
+  if(bind(idS,(struct sockaddr*)&socket_Cons,sizeof(socket_Cons))==-1)
+  {
     perror("bind");
     exit(1);
   }
 
-  if(listen(idS,20)==-1){
+  if(listen(idS,20)==-1)
+  {
     perror("listen");
     exit(1);
   }
-  while(1){
-    nIdS=accept(idS,(struct sockaddr*)&socket_Cons,&toto);
-    if(nIdS==-1){
+
+  while(1)
+  {
+    nIdS=accept(idS,(struct sockaddr*)&socket_Cons,&lenghtSockaddr);
+    if(nIdS==-1)
+    {
       perror("accept");
       exit(1);
     }
@@ -74,21 +80,21 @@ void* consommateur(void* arg){
 
 void* p_fonction(void* arg){
   int nIdS = *(int*)arg;
-  int nbBytes;
-  int reply=1;
 
-  int nbProduitRajoute;
+  int nbProduitRajoute=0;
   while(1){
-    nbBytes=recv(nIdS,(void*)&nbProduitRajoute,4,0);
+    recv(nIdS,(void*)&nbProduitRajoute,4,0);
     pthread_mutex_lock(&vitrine);
-    while(nbProduit>NB_PROD_MAX)
+
+    while(nbProduit+nbProduitRajoute >= NB_PROD_MAX)
       pthread_cond_wait(&fullProduit,&vitrine);
 
-        nbProduit+=nbProduitRajoute;
-        printf("%d\n",nbProduit);
-    send(nIdS,(void*)&reply,4,0);
+    nbProduit+=nbProduitRajoute;
+    printf("nombre produits : %d\n",nbProduit);
+    send(nIdS,(void*)&nbProduit,4,0);
     pthread_mutex_unlock(&vitrine);
     pthread_cond_signal(&noProduit);
+
   }
 }
 
@@ -103,7 +109,8 @@ void* producteur(void* arg){
 
   int yes=1;
 
-  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
+  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1)
+  {
     perror("setsockopt");
     exit(1);
   }
@@ -114,18 +121,23 @@ void* producteur(void* arg){
   strncpy(socket_Prod.sun_path,"/tmp/servProd",sizeof(struct sockaddr_un)-2);
   unlink(socket_Prod.sun_path);
 
-  if(bind(idS,(struct sockaddr*)&socket_Prod,sizeof(socket_Prod))==-1){
+  if(bind(idS,(struct sockaddr*)&socket_Prod,sizeof(socket_Prod))==-1)
+  {
     perror("bind");
     exit(1);
   }
 
-  if(listen(idS,20)==-1){
+  if(listen(idS,20)==-1)
+  {
     perror("listen");
     exit(1);
   }
-  while(1){
+
+  while(1)
+  {
     nIdS=accept(idS,(struct sockaddr*)&socket_Prod,&toto);
-    if(nIdS==-1){
+    if(nIdS==-1)
+    {
       perror("accept");
       exit(1);
     }
@@ -133,7 +145,9 @@ void* producteur(void* arg){
   }
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
+
   pthread_t prod;
   pthread_t cons;
   int i;
@@ -142,9 +156,10 @@ int main(int argc, char** argv){
   pthread_create(&prod,NULL,producteur,NULL);
 
   pthread_create(&cons,NULL,consommateur,NULL);
+  printf("Le serveur est en route \n");
 
   while(1){
-    sleep(1);
+    sleep(10);
   }
- 
+
 }
