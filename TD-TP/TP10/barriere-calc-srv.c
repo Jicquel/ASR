@@ -61,7 +61,7 @@ void* open_account(void* arg){
 
   int idS=socket(AF_UNIX,SOCK_STREAM,0);
   int nIdS,x,nbBytes;
-  socklen_t toto = sizeof(struct sockaddr_un);;
+  socklen_t lengthSock = sizeof(struct sockaddr_un);
 
   int yes=1;
 
@@ -85,8 +85,9 @@ void* open_account(void* arg){
     perror("listen");
     exit(1);
   }
+
   while(1){
-    nIdS=accept(idS,(struct sockaddr*)&socket_Prod,&toto);
+    nIdS=accept(idS,(struct sockaddr*)&socket_Prod,&lengthSock);
     if(nIdS==-1){
       perror("accept");
       exit(1);
@@ -98,7 +99,7 @@ void* open_account(void* arg){
 int main(int argc, char** argv){
 
   int idS=socket(AF_UNIX,SOCK_STREAM,0);
-  int nIdS,x,nbBytes;
+  int nIdS,nbBytes;
 
   int yes=1;
 
@@ -107,13 +108,14 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  struct sockaddr_un socket_Cons;
-  memset(&socket_Cons,0,sizeof(struct sockaddr_un));
-  socket_Cons.sun_family=AF_UNIX;
-  strncpy(socket_Cons.sun_path,"/tmp/servCons",sizeof(struct sockaddr_un)-2);
-  unlink(socket_Cons.sun_path);
+  struct sockaddr_un socket_Client;
+  socklen_t lengthSock = sizeof(socket_Client);
+  memset(&socket_Client,0,sizeof(struct sockaddr_un));
+  socket_Client.sun_family=AF_UNIX;
+  strncpy(socket_Client.sun_path,"/tmp/servClient",sizeof(struct sockaddr_un)-2);
+  unlink(socket_Client.sun_path);
 
-  if(bind(idS,(struct sockaddr*)&socket_Cons,sizeof(socket_Cons))==-1){
+  if(bind(idS,(struct sockaddr*)&socket_Client,sizeof(socket_Client))==-1){
     perror("bind");
     exit(1);
   }
@@ -122,9 +124,11 @@ int main(int argc, char** argv){
     perror("listen");
     exit(1);
   }
+ 
 
-  while(1){
-    sleep(1);
+  while(nIdS = accept(idS,(struct sockaddr*)&socket_Client,&lengthSock) != -1)
+  { 
+    pthread_create(&new_requete, NULL,p_fonction,(void*)&nIdS);
   }
  
 }
