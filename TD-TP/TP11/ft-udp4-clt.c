@@ -24,7 +24,6 @@ int main(int argc, char** argv){
 
   int fd = open(argv[1],O_RDONLY,0644);
   int tranche = atoi(argv[2]);
-  printf("%d", tranche);
 
   if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1)
   {
