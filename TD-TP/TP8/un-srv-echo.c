@@ -32,10 +32,12 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  if(listen(idS,20)==-1){
+  if(listen(idS,3)==-1){
     perror("listen");
     exit(1);
   }
+
+  getchar();
 
 
   while(1){
