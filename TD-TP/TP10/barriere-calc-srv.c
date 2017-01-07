@@ -7,15 +7,43 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <fcntl.h>
 
-#define NB_CLIENT_MAX 2
+#define NB_CLIENT_MAX 5
+#define TAILLE_TAB 65536
 
-int nbClient = 0;
+int nbClient = 0,nbFini=0;
 int timeDepasse=0;
-pthread_mutex_t lock;
 
-int res = 0;
-int idS;
+
+pthread_mutex_t lock,lockFini;
+
+pthread_cond_t peutCommencer=PTHREAD_COND_INITIALIZER;
+pthread_cond_t fini=PTHREAD_COND_INITIALIZER;
+
+/***DONNEES***/
+int tab[TAILLE_TAB];
+int chunckSize=0,nombreDonneesRecues=0;
+int *tabResultat;
+
+
+int idS;//necessaire pour handler
+
+
+struct thread_arg{int idS; int numWorker;};
+
+int max(int tab[],int size)
+{
+  int i;
+  int max=0;
+
+  for(i=0; i < size;i++)
+  {
+    if(max<tab[i])
+      max=tab[i];
+  }
+  return max;
+}
 
 void handler(int signo)
 {
@@ -33,17 +61,34 @@ void* checkTimeFunction (void* arg){
 
 void* client(void* arg){
 
-  int idS = *(int*) arg;
-  int nbBytes=0,reponse;
-  int envoi = 5;
+  struct thread_arg args= *(struct thread_arg*)arg;
+  int idS = args.idS;
+  int numWorker = args.numWorker;
+  int nbBytes=0,max=0;
+  int left;
+  int right;
 
-  send(idS,(void*) &envoi,4,0);
-  nbBytes = recv(idS,(void*)&reponse,sizeof(reponse),0);
-  pthread_mutex_lock(&lock);
-  res+=reponse;
-  printf("Resultat : %d\n", res);
+  char reponse;
+
+  printf("%d'th account created\n",numWorker);
+  printf("%d'th account id:%d\n",numWorker,idS);
+
+  while(nbClient <NB_CLIENT_MAX && timeDepasse != 1)
+    pthread_cond_wait(&peutCommencer,&lock);
+
   pthread_mutex_unlock(&lock);
-  printf("bouh\n");
+  left=chunckSize*numWorker;
+  right=left+chunckSize-1;
+
+  send(idS,(void*)&left,4,0);
+  send(idS,(void*)&right,4,0);
+
+  send(idS,(void*)tab,sizeof(int)*TAILLE_TAB,0);
+  recv(idS,(void*)&max,sizeof(max),0);
+  
+  tabResultat[numWorker]=max;
+  nbFini++;
+  pthread_cond_signal(&fini);
 }
 
 int main(int argc, char** argv){
@@ -53,20 +98,28 @@ int main(int argc, char** argv){
   socklen_t sizelocal = sizeof(struct sockaddr_in);;
   int port,i,yes=1;
   int nIdS[NB_CLIENT_MAX];
+
   pthread_t clients[NB_CLIENT_MAX];
   pthread_t checkTime;
 
   /**SIGACTION**/
   struct sigaction act;
-  /*************/
 
-  if(argc != 2)
+
+
+  if(argc != 3)
   {
-    perror("executable <port>");
+    perror("executable <port> <file to read>");
     exit(1);
   }
 
   if (pthread_mutex_init(&lock, NULL) != 0)
+  {
+    printf("\n mutex init failed\n");
+    return 1;
+  }
+
+  if (pthread_mutex_init(&lockFini, NULL) != 0)
   {
     printf("\n mutex init failed\n");
     return 1;
@@ -87,8 +140,9 @@ int main(int argc, char** argv){
     perror("sigaction");
     exit(1);
   }
-  /*************/
 
+  
+  /***CONFIGURATION SOCKET***/
   port = atoi(argv[1]);
   struct sockaddr_in local;
   memset(&local,0,sizeof(struct sockaddr_un));
@@ -97,6 +151,8 @@ int main(int argc, char** argv){
   local.sin_family = AF_INET;
   local.sin_addr.s_addr = INADDR_ANY;
 
+
+  /***MISE EN ECOUTE SOCKET***/
   if(bind(idS,(struct sockaddr*)&local,sizeof(local))==-1){
     perror("bind");
     exit(1);
@@ -107,6 +163,21 @@ int main(int argc, char** argv){
     exit(1);
   }
 
+
+
+/***INITIALISATION TABLEAU A TRIER***/
+  memset(tab,0,TAILLE_TAB);
+  int fd = open(argv[2],O_RDONLY|0664);
+  if(fd==-1)
+  {
+    perror("open");
+    exit(1);
+  }
+  while(read(fd,(void*)&tab[nombreDonneesRecues],sizeof(int))!=0)
+    nombreDonneesRecues+=1;
+
+
+
   pthread_create(&checkTime,NULL,checkTimeFunction,NULL);
 
   while(nbClient <NB_CLIENT_MAX && timeDepasse != 1)
@@ -115,20 +186,30 @@ int main(int argc, char** argv){
 
     if(nIdS[nbClient] != -1)
     {
+      struct thread_arg args={nIdS[nbClient],nbClient};
+      pthread_create(&clients[nbClient], NULL,client,(void*)&args);
       nbClient++;
     }
   }
 
-  for(i = 0 ; i < nbClient ; i++)
-  {
-    pthread_create(&clients[i], NULL,client,(void*)&nIdS[i]);
-  }
+  chunckSize=TAILLE_TAB/nbClient;
 
-  for(i = 0 ; i < nbClient ; i++)
-  {
-    pthread_join(clients[i],NULL);
-  }
+  printf("%d workers hired, no more vacancies or deadline reached\n",nbClient);
+  printf("SIZE=%d WKS=%d  chunck size=%d",nombreDonneesRecues,nbClient,chunckSize);
+  
 
-  printf("Execution finie : %d\n",res);
+  /***CREATION TABLEAU FINAL***/
+  tabResultat = malloc(nbClient * sizeof(int));
+
+
+  pthread_cond_broadcast(&peutCommencer);
+
+  while(nbFini!=nbClient)
+    pthread_cond_wait(&fini,&lockFini);
+
+  printf("...all done .... MAX=%d\n",max(tabResultat,nbClient));
+
+  
+
   return EXIT_SUCCESS;
 }
