@@ -61,7 +61,7 @@ int main(int argc, char** argv){
     exit(1);
   }
   printf("%s",buff);
-  scanf("%d",&masque);
+  scanf("%x",&masque);
   send(idS,(void*)&masque,sizeof(unsigned int),0);
 
 
@@ -72,7 +72,6 @@ int main(int argc, char** argv){
     exit(1);
   }
   printf("%s",buff);
-  sleep(0);
   scanf("%d",&seedValue);
   send(idS,(void*)&seedValue,sizeof(unsigned int),0);
 
@@ -92,7 +91,7 @@ int main(int argc, char** argv){
   }
 
   close(idS);
-  printf("all done...");
+  printf("\nall done...");
   
   return EXIT_SUCCESS;
 }
