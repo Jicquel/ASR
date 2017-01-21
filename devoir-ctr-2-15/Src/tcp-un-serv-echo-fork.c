@@ -72,7 +72,7 @@ int main(int argc, char** argv){
       /***OBTENTION ARGUMENTS***/
       sprintf(c,"%s","This is a random number generator\nHow many numbers do you need?");
       send(nIdS,c,strlen(c),0);
-      if(recv(nIdS,(void*)&nbreNumber,sizeof(int),0) <= 0)
+      if(recv(nIdS,(void*)&nbreNumber,sizeof(unsigned int),0) <= 0)
       {
         perror("connexion terminée");
         exit(1);
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
       memset(c,0,MAXBUF);
       sprintf(c,"%s","masque?");
       send(nIdS,c,strlen(c),0);
-      if(recv(nIdS,(void*)&masque,sizeof(int),0)<=0)
+      if(recv(nIdS,(void*)&masque,sizeof(unsigned int),0)<=0)
       {
         perror("connexion terminée");
         exit(1);
@@ -90,18 +90,37 @@ int main(int argc, char** argv){
       memset(c,0,MAXBUF);
       sprintf(c,"%s","seed value?");
       send(nIdS,c,strlen(c),0);
-      if(recv(nIdS,(void*)&masque,sizeof(int),0)<=0)
+      if(recv(nIdS,(void*)&seedValue,sizeof(unsigned int),0)<=0)
       {
         perror("connexion terminée");
         exit(1);
       }
 
       /***TRAITEMENT DONNEES A ENVOYER***/
-      
+      int i=0;
+      fd=open("./tmp",O_WRONLY|O_CREAT,0644);
+      if(fd==-1)
+      {
+        perror("open");
+        exit(1);
+      }
+
+      for(i=0;i<nbreNumber;i++)
+      {
+        unsigned int a = rand()%500;
+        write(fd,(void*)&a,sizeof(unsigned int));
+      }
+
+      close(fd);
 
 
       /***ENVOI DES DONNEES***/
       fd = open("./tmp",O_RDONLY); 
+      if(fd==-1)
+      {
+        perror("open");
+        exit(1);
+      }
       memset(bufferNombres,0,MAXFILESIZE);
       if(read(fd,bufferNombres,nbreNumber*sizeof(unsigned int))==-1)
       {

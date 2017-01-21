@@ -72,6 +72,7 @@ int main(int argc, char** argv){
     exit(1);
   }
   printf("%s",buff);
+  sleep(0);
   scanf("%d",&seedValue);
   send(idS,(void*)&seedValue,sizeof(unsigned int),0);
 
@@ -82,7 +83,7 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  printf("%d bytes receivedi\n\n",nbBytes);
+  printf("%d bytes received\n\n",nbBytes);
 
   int i;
   for(i=0;i<nbreNumber;i++)
