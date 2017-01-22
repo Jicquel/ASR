@@ -12,7 +12,6 @@
 #define BUFFER_PORT_SIZE 100
 
 int main(int argc, char** argv){
-  int idS=socket(AF_INET,SOCK_STREAM,0);
   socklen_t sizeRemote = sizeof(struct sockaddr_in);
   int yes=1,nbBytes;
   char buffAddr[BUFFER_ADDR_SIZE],buffPort[BUFFER_PORT_SIZE];
@@ -25,14 +24,6 @@ int main(int argc, char** argv){
   }
 
 
-  struct sockaddr_in remote;
-  memset(&remote,0,sizeof(struct sockaddr_in));
-  remote.sin_family=AF_INET;
-
-  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
-    perror("setsockopt");
-    exit(1);
-  }
 
   /***LECTURE ADRESSE DANS FICHIER***/
   FILE* fdAddr = fopen(argv[1],"r");
@@ -54,19 +45,31 @@ int main(int argc, char** argv){
     }
     while(fgets(buffPort,BUFFER_PORT_SIZE,(FILE*) fdPort)!=NULL){
 
-      /***TENTATIVES CONNEXIONS***/
-      remote.sin_port = htons((int16_t) atoi(buffPort));
-      inet_pton(AF_INET,buffAddr,&(remote.sin_addr.s_addr));
+      if(fork()==0)
+      {
+        /***TENTATIVES CONNEXIONS***/
+        int idS=socket(AF_INET,SOCK_STREAM,0);
+        struct sockaddr_in remote;
+        memset(&remote,0,sizeof(struct sockaddr_in));
+        remote.sin_family=AF_INET;
+        remote.sin_port = htons((int16_t) atoi(buffPort));
+        inet_pton(AF_INET,buffAddr,&(remote.sin_addr.s_addr));
 
-      printf("%s:%s\n",buffAddr,buffPort);
-      if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
-      {
-        perror("connect");
-      }
-      else
-      {
-        printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
-        close(idS);
+        if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
+          perror("setsockopt");
+          exit(1);
+        }
+
+        printf("%s:%s\n",buffAddr,buffPort);
+        if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
+        {
+          perror("connect");
+        }
+        else
+        {
+          printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
+          close(idS);
+        }
       }
       memset(buffPort,0,BUFFER_PORT_SIZE);
     }
