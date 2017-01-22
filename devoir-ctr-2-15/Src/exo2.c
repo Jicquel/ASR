@@ -62,6 +62,11 @@ int main(int argc, char** argv){
       {
         perror("connect");
       }
+      else
+      {
+        printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
+        shutdown(idS,0);
+      }
       memset(buffPort,0,BUFFER_PORT_SIZE);
     }
     fclose(fdPort);
