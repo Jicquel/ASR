@@ -1,0 +1,132 @@
+
+  1.
+    Dans cet exercice il vous faut mettre en place un generateur des nombres 
+    pseudo-aleatoires (serveur), qui peut tourner sur une machine distante, 
+    ainsi qu'un programme-client qui obtient a la demande une _suite_ des 
+    entiers aleatoires de la part du serveur.
+
+    L'algorithme qui donne la suite en question est decrit dans le fichier
+            'algo.txt'
+    Typiquemant cet algorithme prend 3 valeurs a l'entree:
+        - la longueure de la suite a engendrer (conseil: choisissez la 
+          longueure entre 8 et 32)
+	- un entier positif qui initialise la procedure ('seed' en anglais)
+          (les consignes concernant le choix de seed se trouvent dans le
+           meme fichier 'algo.txt')
+	- un masque qui selectionne une plage des bits de la sortie de 
+          la procedure et qui en meme temps pose une limite sur l'intervalle 
+          ou les nombres aleatoires vont se trouver; par exemple, le masque
+	  0xff selectionne les bits [7-0] et par consequent les entiers obtenus
+	  sont entre 0 et 255. 
+
+    Voici le protocole que le couple <clt,srv> doit suivre:
+
+   ====================================
+
+      Clt                           Srv
+               connect
+        >------------------------->
+
+            server presentation 
+            request for args (ascii)
+        <-------------------------<
+
+       sends args (N,K,seed) (unsigned int)
+        >------------------------->    /eventually in 3 times/    
+                            generates
+                            pseudo-random
+                            numbers according
+                            to the given
+                            algorithm and puts
+                            them into a 
+                            _temporary_ file
+
+            sends randoms (file)
+        <-------------------------<
+
+              "thanks"
+        >------------------------->   /optional/
+
+               "bye"
+        <------------------------->    /optional/
+     prints                     closes
+     results                    cleans 
+                                (e.g.
+      closes                    deletes
+                                temporary
+      terminates                files)
+                                exits (the branch)
+    ===================================
+
+    Choisissez le modele de concurrence (processus ou threads) 
+    pour le serveur, etudiez la description d'algirithme 
+    et ecrivez 2 programmes: 
+         'remote-pseudo-random-gen-srv.c'
+         'remote-pseudo-random-gen-clt.c'
+    Faites tourner vos programmes sur deux machines distantes,
+    mettez la trace de leurs dialogue dans le fichier 'reponses.txt',
+    mettez les sources des programmes dans le sous-repertoire 'Src/'.
+    
+    Voici un exemple d'un tel dialogue: 
+    +--------------------------------------------------------+
+    |  This a random number generator                        |
+    |  how many numbers do you need? 12                      |
+    |  masque?  0xff                                         |
+    |  seed value?  1024                                     |
+    |  Connection closed by the server                       |
+    |  48 bytes received                                     |
+    |                                                        |
+    | 180  131  6  173  40  103  154  49  220  139  110  245 |
+    |                                                        |
+    |  all done...                                           |
+    +--------------------------------------------------------+
+    NB: vous etes autorisez de changer le protocole ci-dessus mais 
+        dans ce cas:  
+          (a) vous etes oblige de donner la description _precise_
+              du protocole propose;
+          (b) le resultat de la communication client<->serveur
+              doit etre le meme. 
+
+  2.
+    Le fichier 'addrs.txt' contient une liste d'adresses IP, 
+    le fichier 'ports.txt' contient une liste de ports.
+
+    Pour chaque adresse et pour chaque port il vous faut tester, 
+    est-il possible d'etablir une connexion tcp avec et presenter 
+    les resultats des tests comme suit: 
+    +-----------------------------------------+
+    |  testing 192.168.0.234                  |
+    |  connect : No route to host             |
+    |                                         |
+    |  testing 172.16.1.111                   |
+    |  connect : Connection timed out         |
+    |                                         |
+    |  testing 192.168.0.235:44444            |
+    |  connection established, terminating... |
+    |                                         |
+    |  testing 192.168.0.235:44445            |
+    |  connect : Connection refused           |
+    +-----------------------------------------+
+    Notez svp que chaque adresse non-disponible a ete testee _une_ fois. 
+
+    Ecrivez un programme 'conn-tst.c' qui prends sur la ligne de commande
+    les noms de deux fichiers -- la liste d'adresses et la liste de ports --
+    et qui effectue les tests comme ci-dessus. Mettez la source de ce 
+    programme dans le sous-repertoire 'Src/', mettez les resultats des 
+    tests dans le fichier 'reponses.txt'
+
+    (Consigne: la valeur rendue par 'connect()' et les valeurs du
+    macro 'errno' peuvent vous aider)
+
+  3.
+    Le sous-repertoire 'bin/' de votre repertoire de travail contient
+    l'executable 'whatdoido'. Lancez le. Quelle activite est apparue 
+    dans le reseau? Qu'est ce qu'il fait, ce programme? Mettez 
+    les reponses ansi que les explications necessaires dans le fichier 
+    'reponses.txt'.
+
+    Ecrivez un programme 'similar.c' qui se comporte absolument pareil 
+    (adaptez un des sources que vous avez ecrit en TP). Mettez le source 
+    de ce programme dans le repertoire 'Src/'
+
+  
