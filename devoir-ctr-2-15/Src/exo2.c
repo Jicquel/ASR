@@ -8,16 +8,15 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define BUFFER_NBRE_SIZE 100
-#define MAXSIZE 500
+#define BUFFER_ADDR_SIZE 100
+#define BUFFER_PORT_SIZE 100
 
 int main(int argc, char** argv){
   int idS=socket(AF_INET,SOCK_STREAM,0);
   socklen_t sizeRemote = sizeof(struct sockaddr_in);
   int yes=1,nbBytes;
-  char buffAddr[MAXSIZE],buffPort[MAXSIZE];
+  char buffAddr[BUFFER_ADDR_SIZE],buffPort[BUFFER_PORT_SIZE];
   unsigned int nbreNumber,masque,seedValue;
-  unsigned int nbBuffer[BUFFER_NBRE_SIZE];
 
   if(argc != 3)
   {
@@ -33,38 +32,43 @@ int main(int argc, char** argv){
   struct sockaddr_in remote;
   memset(&remote,0,sizeof(struct sockaddr_in));
   remote.sin_family=AF_INET;
-  int fdAddr = open(argv[1],O_RDONLY);
 
-  int OK=1;
-  while(OK==1)
+  /***LECTURE ADRESSE DANS FICHIER***/
+  FILE* fdAddr = fopen(argv[1],"r");
+  if(fdAddr == NULL)
   {
-    int i=0;
-    memset(buffAddr,0,MAXSIZE);
-
-    /***LECTURE ADRESSE DANS FICHIER***/
-    do
-    {
-      if(read(fdAddr,&buffAddr[i],sizeof(char)<=0))
-      {
-        OK=0;
-        break;
-      }
-      i+=1;
-    } while(buffAddr[i-1]!='\n');
-
-
-    /***LECTURE PORT***
-
-
-
-    /***TENTATIVES CONNEXIONS***/
-    remote.sin_port = htons((int16_t) atoi(buffPort));
-    inet_pton(AF_INET,buffAddr,&(remote.sin_addr.s_addr));
-
-    if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
-    {
-      perror("connect");
-    }
-
-    return EXIT_SUCCESS;
+    perror("fopen");
+    exit(1);
   }
+
+  while(fgets(buffAddr,BUFFER_ADDR_SIZE,(FILE*) fdAddr)!=NULL)
+  {
+
+    /***LECTURE PORT***/
+    FILE* fdPort = fopen(argv[2],"r");
+    if(fdPort == NULL)
+    {
+      perror("fopen");
+      exit(1);
+    }
+    while(fgets(buffPort,BUFFER_PORT_SIZE,(FILE*) fdPort)!=NULL){
+
+      /***TENTATIVES CONNEXIONS***/
+      remote.sin_port = htons((int16_t) atoi(buffPort));
+      inet_pton(AF_INET,buffAddr,&(remote.sin_addr.s_addr));
+
+      printf("%s:%s\n",buffAddr,buffPort);
+      if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
+      {
+        perror("connect");
+      }
+      memset(buffPort,0,BUFFER_PORT_SIZE);
+    }
+    fclose(fdPort);
+      memset(buffAddr,0,BUFFER_ADDR_SIZE);
+  }
+  fclose(fdAddr);
+
+
+  return EXIT_SUCCESS;
+}
