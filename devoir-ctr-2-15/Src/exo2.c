@@ -29,6 +29,11 @@ int main(int argc, char** argv){
   memset(&remote,0,sizeof(struct sockaddr_in));
   remote.sin_family=AF_INET;
 
+  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
+    perror("setsockopt");
+    exit(1);
+  }
+
   /***LECTURE ADRESSE DANS FICHIER***/
   FILE* fdAddr = fopen(argv[1],"r");
   if(fdAddr == NULL)
@@ -62,10 +67,6 @@ int main(int argc, char** argv){
       {
         printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
         close(idS);
-        if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
-          perror("setsockopt");
-          exit(1);
-        }
       }
       memset(buffPort,0,BUFFER_PORT_SIZE);
     }
