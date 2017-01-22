@@ -57,20 +57,25 @@ int main(int argc, char** argv){
       remote.sin_port = htons((int16_t) atoi(buffPort));
       inet_pton(AF_INET,buffAddr,&(remote.sin_addr.s_addr));
 
-      printf("%s:%s\n",buffAddr,buffPort);
-      if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
+      int x=fork();
+      if(x==0)
       {
-        perror("connect");
+        printf("%s:%s\n",buffAddr,buffPort);
+        if(connect(idS,(struct sockaddr*)&remote,sizeof(remote))==-1)
+        {
+          perror("connect");
+        }
+        else
+        {
+          printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
+        }
+        exit(1);
       }
-      else
-      {
-        printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
-        shutdown(idS,0);
-      }
+
       memset(buffPort,0,BUFFER_PORT_SIZE);
     }
     fclose(fdPort);
-      memset(buffAddr,0,BUFFER_ADDR_SIZE);
+    memset(buffAddr,0,BUFFER_ADDR_SIZE);
   }
   fclose(fdAddr);
 
