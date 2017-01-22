@@ -70,6 +70,7 @@ int main(int argc, char** argv){
           printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
           close(idS);
         }
+exit(1);
       }
       memset(buffPort,0,BUFFER_PORT_SIZE);
     }
