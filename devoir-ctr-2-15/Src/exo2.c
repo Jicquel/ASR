@@ -24,10 +24,6 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
-    perror("setsockopt");
-    exit(1);
-  }
 
   struct sockaddr_in remote;
   memset(&remote,0,sizeof(struct sockaddr_in));
@@ -66,14 +62,18 @@ int main(int argc, char** argv){
       {
         printf("Connection nicely done, congrats mate, now i'll let you and have fun with bunch of friends\n");
         close(idS);
+        if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1){
+          perror("setsockopt");
+          exit(1);
+        }
       }
-    memset(buffPort,0,BUFFER_PORT_SIZE);
+      memset(buffPort,0,BUFFER_PORT_SIZE);
+    }
+    fclose(fdPort);
+    memset(buffAddr,0,BUFFER_ADDR_SIZE);
   }
-  fclose(fdPort);
-  memset(buffAddr,0,BUFFER_ADDR_SIZE);
-}
-fclose(fdAddr);
+  fclose(fdAddr);
 
 
-return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
