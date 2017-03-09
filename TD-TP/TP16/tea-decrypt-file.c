@@ -51,7 +51,7 @@ int main(int argc, char** argv)
   //LECTURE CLE 
   read(fdKey, (void*) key, 4*(sizeof(unsigned int)));
  
-  while(read(fdCypher,(void*) v, 2 * sizeof(unsigned int)) != -1)
+  while(read(fdCypher,(void*) v, 2 * sizeof(unsigned int)) > 0 )
   {
 	tea_decrypt(v,key);
     if(write(fdPlain, (void*) v, 2*sizeof(unsigned int)) == -1)

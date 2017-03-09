@@ -50,12 +50,13 @@ int main(int argc, char** argv)
     
   //LECTURE CLE 
   read(fdKey, (void*) key, 4*(sizeof(unsigned int)));
+  printf("%hu",key[0]);
  
-  while(read(fdPlain,(void*) v, 2 * sizeof(unsigned int)) <=0 )
+  while(read(fdPlain,(void*) v, 2 * sizeof(unsigned int)) > 0 )
   {
-    printf("salut");
+    printf("%hd\n",v[0]);
     tea_encrypt(v,key);
-    if(write(fdCypher, (void*) v, 2*sizeof(unsigned int)) <= 0 )
+    if(write(fdCypher, (void*) v, 2*sizeof(unsigned int)) == -1 )
     {
     perror("write fdCyper");
     exit(1);
