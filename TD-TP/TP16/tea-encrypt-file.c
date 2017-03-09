@@ -27,21 +27,21 @@ int main(int argc, char** argv)
     exit(1);
   }
   
-  int fdKey=open("key-tst.tk",O_RDONLY);
+  int fdKey=open(argv[1],O_RDONLY);
   if(fdKey==-1)
   {
     perror("open");
     exit(1);
   }
 
-  int fdPlain=open("foo-tst.dat",O_RDONLY);
+  int fdPlain=open(argv[2],O_RDONLY);
   if(fdPlain==-1)
   {
     perror("open");
     exit(1);
   }
 
-  int fdCypher=open("foo-tst.cry",O_CREAT|O_WRONLY);
+  int fdCypher=open(argv[3],O_CREAT|O_WRONLY);
   if(fdPlain==-1)
   {
     perror("open");
@@ -51,9 +51,11 @@ int main(int argc, char** argv)
   //LECTURE CLE 
   read(fdKey, (void*) key, 4*(sizeof(unsigned int)));
  
-  while(read(fdPlain,(void*) v, 2 * sizeof(unsigned int)) != -1)
+  while(read(fdPlain,(void*) v, 2 * sizeof(unsigned int)) <=0 )
   {
-    if(write(fdCypher, (void*) v, 2*sizeof(unsigned int)) == -1)
+    printf("salut");
+    tea_encrypt(v,key);
+    if(write(fdCypher, (void*) v, 2*sizeof(unsigned int)) <= 0 )
     {
     perror("write fdCyper");
     exit(1);
