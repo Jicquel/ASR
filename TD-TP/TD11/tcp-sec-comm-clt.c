@@ -22,8 +22,8 @@ unsigned int exponen(unsigned int g, unsigned int exposant, unsigned int p)
     {
       res = (res*tmp) % p;
     }
-      tmp= (tmp*tmp) % p;
-  exposant = exposant/2;
+    tmp= (tmp*tmp) % p;
+    exposant = exposant/2;
   }
   return res;
 }
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 
   printf("res : %hu", exponen(3,10,45));
 
- /* int idS=socket(AF_INET,SOCK_STREAM,0);
+  int idS=socket(AF_INET,SOCK_STREAM,0);
   socklen_t sizeRemote = sizeof(struct sockaddr_in);;
   int yes=1,nbByte;
   char buff[MAXSIZE];
@@ -81,21 +81,34 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  printf("QUIT pour quitter");
-  printf("message à envoyer : ");
-  scanf("%s",buff);
 
-  while(strcmp(buff,"QUIT")!=0)
-  {
-    send(idS,buff,strlen(buff),0);
-    printf("envoi\n");
-    recv(idS,(void*) buff,MAXSIZE,0);
-    printf("message reçu : %s\n",buff);
-    printf("\nmessage à envoyer : ");
+  unsigned int p,g, tmp,xa,ya,xb,yb,za;
+  printf("nombre premier p : ");
+  scanf("%d",&p);
 
-    memset(buff,0,MAXSIZE);
-    scanf("%s",buff);
-  }
-  */
-  return EXIT_SUCCESS;
+  printf("generateur g de p tq g < p : ");
+  scanf("%d",&g);
+
+  /**envoi de p***/
+  send(idS,(void*) &p,4,0);
+  recv(idS,(void*) &tmp,4,0);
+  printf("p envoye\n");
+
+  /***envoi de g***/
+  send(idS,(void*) &g,4,0);
+  recv(idS,(void*) &tmp,4,0);
+  printf("g envoye\n");
+
+  /***reception de yb***/
+  recv(idS,(void*) &yb,4,0);
+
+  /***choix secret xa***/
+  xa = (unsigned int) (rand()%(p-2))+2;
+
+  /***calcul ya et za***/
+ya = exponen(g,xa,p);
+za= 
+
+
+return EXIT_SUCCESS;
 }
