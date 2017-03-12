@@ -46,6 +46,17 @@ int verif_gen(unsigned int p, unsigned int g)
   return 1;
 }
 
+void tea_encrypt(unsigned int v[2], unsigned int k[4])
+{
+  unsigned int delta = 0x9e3779b9;
+  int i;
+  for(i=1;i<=32;i++)
+  {
+    v[0]+=(k[0]+(v[1]<<4))^(v[1]*(delta*i))^(k[1]+(v[1]>>5));
+    v[1]+=(k[2]+(v[0]<<4))^(v[0]*(delta*i))^(k[3]+(v[0]>>5));
+  }
+}
+
 
 
 int main(int argc, char** argv){
@@ -83,6 +94,7 @@ int main(int argc, char** argv){
 
 
   unsigned int p,g, tmp,xa,ya,xb,yb,za;
+  unsigned int k[4];
   printf("nombre premier p : ");
   scanf("%d",&p);
 
@@ -107,7 +119,14 @@ int main(int argc, char** argv){
 
   /***calcul ya et za***/
 ya = exponen(g,xa,p);
-za= 
+za = exponen(yb,xa,p);
+
+/***construction key k***/
+k[0] = ~za;
+k[1] = k[0] & 16383;
+k[2] = k[1] | 16383;
+k[3] = za;
+
 
 
 return EXIT_SUCCESS;
