@@ -7,7 +7,25 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define MAXBUF 33
+#define MAXBUF 500
+
+unsigned int exponen(unsigned int g, unsigned int exposant, unsigned int p)
+{
+  unsigned int res = 1;
+  unsigned int tmp = g;
+
+  int i;
+  for(i=1;i<32;i++)
+  {
+    if(exposant%2 == 1)
+    {
+      res = (res*tmp) % p;
+    }
+    tmp= (tmp*tmp) % p;
+    exposant = exposant/2;
+  }
+  return res;
+}
 
 int main(int argc, char** argv){
   int idS=socket(AF_INET,SOCK_STREAM,0);
@@ -17,22 +35,15 @@ int main(int argc, char** argv){
   char c[MAXBUF];
   int port;
 
-  if(argc != 3)
+  if(argc != 2)
   {
-    perror("executable <port> <file destination>");
+    perror("executable <port>");
     exit(1);
   }
 
   if(setsockopt(idS,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==-1)
   {
     perror("setsockopt");
-    exit(1);
-  }
-
-  int fd=open(argv[2],O_CREAT|O_WRONLY,0666);
-  if(fd ==-1)
-  {
-    perror("open");
     exit(1);
   }
 
@@ -56,28 +67,52 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  while(1)
-  {
-    nIdS=accept(idS,(struct sockaddr*)&local,&sizelocal);
+  nIdS=accept(idS,(struct sockaddr*)&local,&sizelocal);
 
-    if(nIdS==-1)
-    {
-      perror("accept");
-      exit(1);
-    }
-    while(1)
-    {
-      nbBytes=recv(nIdS,c,MAXBUF,0);
-      if(nbBytes<=0)
-      {
-        perror("connexion terminée");
-        exit(1);
-      }
-      printf("nbByte : %d\n",nbBytes);
-      send(nIdS,c,nbBytes,0);
-      memset(c,0,MAXBUF);
-    }
+  if(nIdS==-1)
+  {
+    perror("accept");
+    exit(1);
   }
 
-  return EXIT_SUCCESS;
+
+  unsigned int p,g,xb;
+/***reception de p***/
+  recv(nIdS,(void*) &p,4,0);
+  send(nIdS,(void*) &p,4,0);
+
+  /***reception de g***/
+  recv(nIdS,(void*) &g,4,0);
+  send(nIdS,(void*) &g,4,0);
+
+/***choix secret xb***/
+  xb = (unsigned int) (rand()%(p-2))+2;
+
+  /***calcul yb***/
+  yb = exponen(g,xb,p);
+  
+  /***envoi de yb***/
+  send(IdS,(void*) &yb,4,0);
+
+  /***calcul zb***/
+  zb = exponen(yb,xa,p);
+  
+  /***
+
+  while(1)
+  {
+    nbBytes=recv(nIdS,c,MAXBUF,0);
+    if(nbBytes<=0)
+    {
+      perror("connexion terminée");
+      exit(1);
+    }
+    printf("nbByte : %d\n",nbBytes);
+    send(nIdS,c,nbBytes,0);
+    memset(c,0,MAXBUF);
+  }
+
+
+
+return EXIT_SUCCESS;
 }

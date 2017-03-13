@@ -61,8 +61,6 @@ void tea_encrypt(unsigned int v[2], unsigned int k[4])
 
 int main(int argc, char** argv){
 
-  printf("res : %hu", exponen(3,10,45));
-
   int idS=socket(AF_INET,SOCK_STREAM,0);
   socklen_t sizeRemote = sizeof(struct sockaddr_in);;
   int yes=1,nbByte;
@@ -121,6 +119,10 @@ int main(int argc, char** argv){
   ya = exponen(g,xa,p);
   za = exponen(yb,xa,p);
 
+  /***envoi ya***/
+  send(idS,(void*) &ya,4,0);
+
+
   /***construction key k***/
   k[0] = ~za;
   k[1] = k[0] & 16383;
@@ -135,14 +137,19 @@ int main(int argc, char** argv){
   int numBlock=0;
   while(numBlock < strlen(buff))
   {
-      if(numBlock+ BLOCK_SIZE < strlen(buff))
-      {
-      send(idS,buff+numBlock,BLOCK_SIZE,0);
-      }
-      else
-      {
-      send(idS,buff+numBlock,strlen(buff)-numBlock,0);
-      }
+    unsigned int v[2]; 
+    if(numBlock+ BLOCK_SIZE < strlen(buff))
+    {
+      bcopy((void*)buff+numBlock,(void*)v,8);
+    }
+    else
+    {
+      bcopy((void*)buff+numBlock,(void*)v,strlen(buff)-numBlock);
+    }
+    tea_encrypt(v,k);
+    send(idS,buff+numBlock,BLOCK_SIZE,0);
+    memset((void*)v,0,8);
   }
-return EXIT_SUCCESS;
+
+  return EXIT_SUCCESS;
 }
