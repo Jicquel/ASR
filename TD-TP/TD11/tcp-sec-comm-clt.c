@@ -57,8 +57,6 @@ void tea_encrypt(unsigned int v[2], unsigned int k[4])
   }
 }
 
-
-
 int main(int argc, char** argv){
 
   int idS=socket(AF_INET,SOCK_STREAM,0);

@@ -76,7 +76,9 @@ int main(int argc, char** argv){
   }
 
 
-  unsigned int p,g,xb;
+  unsigned int p,g,xb,yb,ya,zb;
+  unsigned int k[4];
+
 /***reception de p***/
   recv(nIdS,(void*) &p,4,0);
   send(nIdS,(void*) &p,4,0);
@@ -92,12 +94,19 @@ int main(int argc, char** argv){
   yb = exponen(g,xb,p);
   
   /***envoi de yb***/
-  send(IdS,(void*) &yb,4,0);
+  send(nIdS,(void*) &yb,4,0);
+
+/***reception de ya***/
+  recv(nIdS,(void*) &ya,4,0);
 
   /***calcul zb***/
-  zb = exponen(yb,xa,p);
+  zb = exponen(ya,xb,p);
   
-  /***
+  /***construction key k***/
+  k[0] = ~zb;
+  k[1] = k[0] & 16383;
+  k[2] = k[1] | 16383;
+  k[3] = zb;
 
   while(1)
   {
@@ -108,7 +117,6 @@ int main(int argc, char** argv){
       exit(1);
     }
     printf("nbByte : %d\n",nbBytes);
-    send(nIdS,c,nbBytes,0);
     memset(c,0,MAXBUF);
   }
 
