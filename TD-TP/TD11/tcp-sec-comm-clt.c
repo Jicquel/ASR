@@ -133,10 +133,11 @@ int main(int argc, char** argv){
 
   /***envoi bloc par bloc***/
   int numBlock=0;
+    unsigned int v[2]; 
   while(numBlock < strlen(buff))
   {
-    unsigned int v[2]; 
-    if(numBlock+ BLOCK_SIZE < strlen(buff))
+    printf("num block : %d\n, length : %d\n",numBlock,strlen(buff));
+    if(numBlock+BLOCK_SIZE < strlen(buff))
     {
       bcopy((void*)buff+numBlock,(void*)v,8);
     }
@@ -145,7 +146,8 @@ int main(int argc, char** argv){
       bcopy((void*)buff+numBlock,(void*)v,strlen(buff)-numBlock);
     }
     tea_encrypt(v,k);
-    send(idS,buff+numBlock,BLOCK_SIZE,0);
+    send(idS,v,8,0);
+    numBlock+=BLOCK_SIZE;
     memset((void*)v,0,8);
   }
 
