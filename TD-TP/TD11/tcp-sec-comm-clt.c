@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 
 #define MAXSIZE 500
-
+#define BLOCK_SIZE 8
 
 unsigned int exponen(unsigned int g, unsigned int exposant, unsigned int p)
 {
@@ -118,16 +118,31 @@ int main(int argc, char** argv){
   xa = (unsigned int) (rand()%(p-2))+2;
 
   /***calcul ya et za***/
-ya = exponen(g,xa,p);
-za = exponen(yb,xa,p);
+  ya = exponen(g,xa,p);
+  za = exponen(yb,xa,p);
 
-/***construction key k***/
-k[0] = ~za;
-k[1] = k[0] & 16383;
-k[2] = k[1] | 16383;
-k[3] = za;
+  /***construction key k***/
+  k[0] = ~za;
+  k[1] = k[0] & 16383;
+  k[2] = k[1] | 16383;
+  k[3] = za;
 
+  /***lecture input***/
+  printf("message à envoyer : ");
+  scanf("%s",buff);
 
-
+  /***envoi bloc par bloc***/
+  int numBlock=0;
+  while(numBlock < strlen(buff))
+  {
+      if(numBlock+ BLOCK_SIZE < strlen(buff))
+      {
+      send(idS,buff+numBlock,BLOCK_SIZE,0);
+      }
+      else
+      {
+      send(idS,buff+numBlock,strlen(buff)-numBlock,0);
+      }
+  }
 return EXIT_SUCCESS;
 }
