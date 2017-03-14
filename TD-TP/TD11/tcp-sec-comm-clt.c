@@ -136,7 +136,6 @@ int main(int argc, char** argv){
     unsigned int v[2]; 
   while(numBlock < strlen(buff))
   {
-    printf("num block : %d\n, length : %d\n",numBlock,strlen(buff));
     if(numBlock+BLOCK_SIZE < strlen(buff))
     {
       bcopy((void*)buff+numBlock,(void*)v,8);

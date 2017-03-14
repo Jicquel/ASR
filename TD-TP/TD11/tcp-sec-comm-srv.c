@@ -124,16 +124,14 @@ int main(int argc, char** argv){
   {
     nbBytes=recv(nIdS,v,8,0);
     tea_decrypt(v,k);
-    printf("%d",nbBytes);
 
     if(nbBytes<=0)
     {
       perror("connexion terminée");
       exit(1);
     }
-    bcopy((void*)v,(void*)buff,8);
-    printf("%s",buff);
-    printf("%d",strlen(buff));
+    memcpy((void*)buff,(void*)v,8);
+    write(1,buff,8);
     memset((void*)v,0,8);
     memset(buff,0,8);
   }
