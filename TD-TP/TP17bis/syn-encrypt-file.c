@@ -9,7 +9,7 @@ int main(int argc,char** argv)
   unsigned char block = 45;
 
   printf("avant cryptage  : %c\n", block);
-  block = encryt_block(block,key);
+  block = encrypt_block(block,key);
 
   printf("apres cryptage  : %c\n", block);
   block = decrypt_block(block,key);
