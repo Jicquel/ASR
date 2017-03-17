@@ -1,7 +1,8 @@
 #include "crypt.h"
+#include <stdio.h>
+#include <string.h>
 
-
-unsigned char encrypt_block(unsigned char  block, unsigned short key)
+unsigned char encrypt_block(unsigned char  block, unsigned short key, unsigned char substitutions[RANGE_VALUE_SUBST], unsigned char permutations[BLOCK_SIZE])
 {
   unsigned char k[2];
 
@@ -9,16 +10,6 @@ unsigned char encrypt_block(unsigned char  block, unsigned short key)
 
   unsigned char blockTmp = 0;
   unsigned char mask =0;
-
-  unsigned int perm[8];
-  perm[0]=2;
-  perm[1]=1;
-  perm[2]=4;
-  perm[3]=7;
-  perm[4]=3;
-  perm[5]=6;
-  perm[6]=5;
-  perm[7]=0;
 
   int nbTour;
   for(nbTour = 0 ; nbTour < NB_TOUR ; nbTour++)
@@ -28,29 +19,28 @@ unsigned char encrypt_block(unsigned char  block, unsigned short key)
     //SUBSTITUTIONS
     blockTmp = 0;
     mask = 0xf;
-    blockTmp = blockTmp | ((block & mask)<<4);
+    blockTmp |= substitutions[(block & mask)];
     mask = mask << 4;
-    blockTmp = blockTmp | ((block & mask)>>4);
+    blockTmp |= (substitutions[(block & mask)>>4] << 4);
     block = blockTmp;
 
     //PERMUTATIONS
     int j;
     blockTmp = 0;
     mask = 0x1;
-    for(j=0;j<8;j++)
+    for(j=0;j<BLOCK_SIZE;j++)
     {
-      blockTmp |= (block & (mask << perm[j]));
+      blockTmp |= (block & (mask << permutations[j]));
     }
     block = blockTmp;
-
     block = block ^ k[1];
 
     //SUBSTITUTIONS
     blockTmp = 0;
     mask = 0xf;
-    blockTmp = blockTmp | ((block & mask)<<4);
+    blockTmp |= substitutions[(block & mask)];
     mask = mask << 4;
-    blockTmp = blockTmp | ((block & mask)>>4);
+    blockTmp |= (substitutions[(block & mask)>>4] << 4);
     block = blockTmp;
 
     //PERMUTATIONS
@@ -58,7 +48,7 @@ unsigned char encrypt_block(unsigned char  block, unsigned short key)
     mask = 0x1;
     for(j=0;j<8;j++)
     {
-      blockTmp |= (block & (mask << perm[j]));
+      blockTmp |= (block & (mask << permutations[j]));
     }
     block = blockTmp;
   }
@@ -109,7 +99,7 @@ unsigned char decrypt_block(unsigned char block, unsigned short key)
     blockTmp = blockTmp | ((block & mask)>>4);
     block = blockTmp;
 
-   block = block ^ k[1];
+    block = block ^ k[1];
 
     //PERMUTATIONS
     blockTmp = 0;
