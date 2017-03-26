@@ -35,14 +35,14 @@ int main(int argc,char** argv)
     exit(1);
   }
 
-  int fdPlain=open(argv[4],O_RDONLY);
+  int fdPlain=open(argv[4],O_CREAT|O_WRONLY,0644);
   if(fdPlain==-1)
   {
     perror("open plain");
     exit(1);
   }
 
-  int fdCipher=open(argv[5],O_CREAT|O_WRONLY,0664);
+  int fdCipher=open(argv[5],O_RDONLY);
   if(fdCipher==-1)
   {
     perror("open cipher");
@@ -69,6 +69,12 @@ int main(int argc,char** argv)
     exit(1);
   }
 
+  unsigned char permInverse[8];
+  int i;
+  for(i=0; i < 8 ; i++)
+    permInverse[perm[i]] = i;
+
+
   //LECTURE SUBSTITUTIONS
   unsigned char substitutions[16];
 
@@ -79,22 +85,25 @@ int main(int argc,char** argv)
     exit(1);
   }
 
+  unsigned char substitutionsInverse[16];
+  for(i=0; i < 16 ; i++)
+    substitutionsInverse[substitutions[i]] = i;
 
-  //CRYPTAGE
+
+  //DECRYPTAGE
   unsigned char block = 0;
-
-  while(read(fdPlain, (void*) &block, sizeof(unsigned char)) > 0)
+  
+  while(read(fdCipher, (void*) &block, sizeof(unsigned char)) > 0)
   {
-    printf("avant cryptage  : %u\n", block);
-    block = encrypt_block(block,key,substitutions,perm);
+  block = decrypt_block(block,key,substitutionsInverse,perm);
 
-    if(write(fdCipher,(void*) &block, sizeof(block)) == -1)
-    {
-      perror("write cipher");
-      exit(1);
-    }
-    block = 0;
+  if(write(fdPlain,(void*) &block, sizeof(block)) == -1)
+  {
+    perror("write plain");
+    exit(1);
   }
+  block = 0;
+}
 
   return EXIT_SUCCESS;
 }
