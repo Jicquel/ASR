@@ -95,7 +95,7 @@ int main(int argc,char** argv)
   
   while(read(fdCipher, (void*) &block, sizeof(unsigned char)) > 0)
   {
-  block = decrypt_block(block,key,substitutionsInverse,perm);
+  block = decrypt_block(block,key,substitutionsInverse,permInverse);
 
   if(write(fdPlain,(void*) &block, sizeof(block)) == -1)
   {

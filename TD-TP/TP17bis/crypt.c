@@ -6,7 +6,7 @@ unsigned char encrypt_block(unsigned char  block, unsigned short key, unsigned c
 {
   unsigned char k[2];
 
-  memcpy((void*)k,(void*)&key,16);
+  memcpy((void*)k,(void*)&key,2*sizeof(unsigned char));
 
   unsigned char blockTmp = 0;
   unsigned char mask =0;
@@ -54,7 +54,7 @@ unsigned char decrypt_block(unsigned char  block, unsigned short key, unsigned c
 {
   unsigned char k[2];
 
-  memcpy((void*)k,(void*)&key,16);
+  memcpy((void*)k,(void*)&key,2*sizeof(unsigned char));
 
   unsigned char blockTmp = 0;
   unsigned char mask =0;
