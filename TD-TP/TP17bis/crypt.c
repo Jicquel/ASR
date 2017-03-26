@@ -11,6 +11,8 @@ unsigned char encrypt_block(unsigned char  block, unsigned short key, unsigned c
   unsigned char blockTmp = 0;
   unsigned char mask =0;
 
+  block = block ^ k[0];
+
   //SUBSTITUTIONS
   blockTmp = 0;
   mask = 0xf;
