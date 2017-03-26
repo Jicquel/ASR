@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   }
 
 
-  int fdPerm = open(argv[1],O_CREAT|O_WRONLY);
+  int fdPerm = open(argv[1],O_CREAT|O_WRONLY,0664);
   if(fdPerm==-1)
   {
     perror("open perm");

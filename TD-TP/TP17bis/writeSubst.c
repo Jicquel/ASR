@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   }
 
 
-  int fdSubst = open(argv[1],O_CREAT|O_WRONLY);
+  int fdSubst = open(argv[1],O_CREAT|O_WRONLY,0664);
   if(fdSubst==-1)
   {
     perror("open subst");
