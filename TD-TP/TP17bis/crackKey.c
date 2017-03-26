@@ -9,7 +9,7 @@
 int main(int argc,char** argv)
 {
 
-  if(argc != 6)
+  if(argc != 5)
   {
     perror("exe <substitution file> <permutation file> <plain file> <cipher file>");
     exit(1);
