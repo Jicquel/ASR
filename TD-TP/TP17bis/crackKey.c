@@ -70,6 +70,7 @@ int main(int argc,char** argv)
   //CRACKAGE
   unsigned short key = 0;
   unsigned char blockCrypted = 0;
+  unsigned char blockUncrypted = 0;
   unsigned char block=0;
 
   if(read(fdCipher, (void*) &blockCrypted, sizeof(unsigned char)) <= 0)
@@ -78,14 +79,22 @@ int main(int argc,char** argv)
     exit(1);
   }
 
+  if(read(fdPlain, (void*) &blockUncrypted, sizeof(unsigned char)) <= 0)
+  {
+    perror("read plain");
+    exit(1);
+  }
+
   for(key = 0; key < 65536 ; key++)
   {
-    block = encrypt_block(block,key,substitutions,perm);
+
+    block = encrypt_block(blockUncrypted,key,substitutions,perm);
     if(block == blockCrypted)
-      {
-        printf("key : %u\n", key);
-        break;
-       }
+    {
+      printf("key : %u\n", key);
+      break;
+    }
+    block = 0;
   }
 
   return EXIT_SUCCESS;
