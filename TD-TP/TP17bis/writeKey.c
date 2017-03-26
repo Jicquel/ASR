@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   }
 
 
-  int fdKey = open(argv[2],O_CREAT|O_WRONLY|0664);
+  int fdKey = open(argv[2],O_CREAT|O_WRONLY,0664);
   if(fdKey==-1)
   {
     perror("open key");
