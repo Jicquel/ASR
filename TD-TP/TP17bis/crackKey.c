@@ -102,11 +102,12 @@ int main(int argc,char** argv)
 			printf("%hu",key);
 			break;
 
-			block = 0;
 		}
 
-		return EXIT_SUCCESS;
 	}
+
+	return EXIT_SUCCESS;
+}
 
 
 
