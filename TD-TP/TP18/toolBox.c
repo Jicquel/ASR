@@ -102,7 +102,10 @@ ClefPrivee obtenirClefPrivee(unsigned int e, unsigned short p, unsigned short q)
   unsigned int n = p*q;
 
   Solution s = bezout(e, phiDeN);
-  clef.d = s.x;
+  while(s.x <0)
+    s.x+=phiDeN;
+  clef.d = ((s.x)%phiDeN);
+
   clef.n = n;
 
   return clef;
