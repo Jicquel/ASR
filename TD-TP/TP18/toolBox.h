@@ -34,8 +34,8 @@ typedef struct clefPrivee_ {
 
 ClefPublique obtenirClefPublique( unsigned short p, unsigned short q);
 
-ClefPrivee obtenirClefPrivee(unsigned int e, unsigned short p, unsigned short q);
+ClefPrivee obtenirClefPrivee(unsigned int e, unsigned int p, unsigned int q);
 
-void obtenirCoupleClefs(ClefPublique* clefPublique, ClefPrivee* clefPrivee, unsigned short p, unsigned short q);
+void obtenirCoupleClefs(ClefPublique* clefPublique, ClefPrivee* clefPrivee, unsigned int p, unsigned int q);
 
 #endif

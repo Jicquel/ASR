@@ -94,7 +94,7 @@ ClefPublique obtenirClefPublique( unsigned short p, unsigned short q)
   return clef;
 }
 
-ClefPrivee obtenirClefPrivee(unsigned int e, unsigned short p, unsigned short q)
+ClefPrivee obtenirClefPrivee(unsigned int e, unsigned int p, unsigned int q)
 {
 
   ClefPrivee clef;
@@ -111,7 +111,7 @@ ClefPrivee obtenirClefPrivee(unsigned int e, unsigned short p, unsigned short q)
   return clef;
 }
 
-void obtenirCoupleClefs(ClefPublique* clefPublique, ClefPrivee* clefPrivee, unsigned short p, unsigned short q)
+void obtenirCoupleClefs(ClefPublique* clefPublique, ClefPrivee* clefPrivee, unsigned int p, unsigned int q)
 {
   *clefPublique = obtenirClefPublique(p,q);
   *clefPrivee = obtenirClefPrivee(clefPublique->e,p,q);
